@@ -10,4 +10,5 @@ export interface LoginResponseDTO {
   idCompte: number;
   email: string;
   doitChangerMotDePasse: boolean;
+  token: string;
 }

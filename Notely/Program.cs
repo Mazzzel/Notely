@@ -50,18 +50,6 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
-        {
-            var token = context.HttpContext.Request.Cookies["access_token"];
-            if (!string.IsNullOrEmpty(token))
-                context.Token = token;
-
-            return Task.CompletedTask;
-        }
-    };
-
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -89,9 +77,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFront", policy =>
     {
         if (!string.IsNullOrWhiteSpace(allowedOrigin))
-            policy.WithOrigins(allowedOrigin).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+            policy.WithOrigins(allowedOrigin).AllowAnyHeader().AllowAnyMethod();
         else
-            policy.SetIsOriginAllowed(_ => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+            policy.SetIsOriginAllowed(_ => true).AllowAnyHeader().AllowAnyMethod();
     });
 });
 

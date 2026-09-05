@@ -9,7 +9,8 @@ using Notely.Services;
 namespace Notely.Controllers;
 
 /// <summary>
-/// Authentification. Les comptes sont créés directement en base avec un mot de passe
+/// Authentification par token Bearer (le front stocke le token et l'envoie via l'en-tête
+/// Authorization). Les comptes sont créés directement en base avec un mot de passe
 /// temporaire et le flag DoitChangerMotDePasse à true : tant que ce flag est actif,
 /// seules les routes de ce contrôleur restent accessibles.
 /// </summary>
@@ -38,15 +39,16 @@ public class AuthController(
         compte.DateDerniereConnexion = DateTime.UtcNow;
         await _manager.SaveChangesAsync();
 
-        SetAuthCookie(_jwt.GenerateToken(compte));
+        var response = _mapper.Map<LoginResponseDTO>(compte);
+        response.Token = _jwt.GenerateToken(compte);
 
-        return Ok(_mapper.Map<LoginResponseDTO>(compte));
+        return Ok(response);
     }
 
     [HttpPost]
     [Authorize]
     [ActionName("ChangePassword")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO dto)
     {
@@ -64,9 +66,7 @@ public class AuthController(
         compte.DoitChangerMotDePasse = false;
         await _manager.SaveChangesAsync();
 
-        SetAuthCookie(_jwt.GenerateToken(compte));
-
-        return NoContent();
+        return Ok(new { token = _jwt.GenerateToken(compte) });
     }
 
     [HttpGet]
@@ -88,26 +88,6 @@ public class AuthController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult Logout()
     {
-        var isHttps = Request.IsHttps;
-        Response.Cookies.Delete("access_token", new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = isHttps,
-            SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax
-        });
         return NoContent();
-    }
-
-    private void SetAuthCookie(string token)
-    {
-        var isHttps = Request.IsHttps;
-
-        Response.Cookies.Append("access_token", token, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = isHttps,
-            SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
-        });
     }
 }
