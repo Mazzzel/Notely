@@ -1,0 +1,157 @@
+<section class="block">
+  <h2>Salle</h2>
+  <p class="sub">Programme tes séances à la salle de musculation.</p>
+
+  <div class="card">
+    <app-week-calendar [events]="events()" (eventClick)="onEventClick($event)"></app-week-calendar>
+
+    <form class="event-add" [formGroup]="form" (ngSubmit)="submit()">
+      <input type="text" formControlName="titre" placeholder="Titre (ex. Muscu)" />
+      <input type="date" formControlName="date" />
+      <input type="time" formControlName="heureDebut" />
+      <input type="time" formControlName="heureFin" />
+      <input type="color" formControlName="couleur" title="Couleur de l'événement" />
+      <input type="text" formControlName="commentaire" placeholder="Commentaire (optionnel)" />
+      <button type="submit" class="btn" [disabled]="form.invalid">Ajouter</button>
+    </form>
+
+    @if (form.errors?.['endBeforeStart']) {
+      <p class="error-text" style="padding: 0 18px 12px;">L'heure de fin doit être après l'heure de début.</p>
+    }
+    @if (errorMessage()) {
+      <p class="error-text" style="padding: 0 18px 12px;">{{ errorMessage() }}</p>
+    }
+  </div>
+</section>
+
+<section class="block">
+  <h2>Journal de séances</h2>
+  <p class="sub">Note les exercices, séries, répétitions et poids de chaque séance.</p>
+
+  <div class="card seance-builder">
+    <div class="builder-row">
+      <label>
+        Date
+        <input type="date" [(ngModel)]="draftDate" [ngModelOptions]="{ standalone: true }" />
+      </label>
+      <label class="grow">
+        Commentaire
+        <input type="text" [(ngModel)]="draftCommentaire" [ngModelOptions]="{ standalone: true }" placeholder="Optionnel" />
+      </label>
+    </div>
+
+    <div class="add-exercice-row">
+      <input
+        type="text"
+        list="exercice-suggestions"
+        placeholder="Nom de l'exercice (ex. Développé couché)"
+        [(ngModel)]="newExerciceNom"
+        [ngModelOptions]="{ standalone: true }"
+        (keyup.enter)="addDraftExercice()"
+      />
+      <datalist id="exercice-suggestions">
+        @for (nom of exerciceNames(); track nom) {
+          <option [value]="nom"></option>
+        }
+      </datalist>
+      <button type="button" class="btn small" (click)="addDraftExercice()">Ajouter un exercice</button>
+    </div>
+
+    @if (draftExercices().length === 0) {
+      <p class="empty">Ajoute un exercice pour commencer à remplir la séance.</p>
+    }
+
+    @for (ex of draftExercices(); track $index; let exIndex = $index) {
+      <div class="draft-exercice">
+        <div class="draft-exercice-head">
+          <strong>{{ ex.nom }}</strong>
+          <button type="button" class="btn danger" (click)="removeDraftExercice(exIndex)" title="Retirer cet exercice">✕</button>
+        </div>
+
+        <table>
+          <thead><tr><th>Série</th><th>Reps</th><th>Poids (kg)</th><th></th></tr></thead>
+          <tbody>
+            @for (serie of ex.series; track $index; let serieIndex = $index) {
+              <tr>
+                <td>{{ serie.numeroSerie }}</td>
+                <td>{{ serie.nombreReps }}</td>
+                <td>{{ serie.poids ?? '—' }}</td>
+                <td><button type="button" class="btn danger" (click)="removeDraftSerie(exIndex, serieIndex)">✕</button></td>
+              </tr>
+            }
+            <tr class="row-form">
+              <td>{{ ex.series.length + 1 }}</td>
+              <td><input type="number" min="1" placeholder="Reps" [(ngModel)]="ex.nextReps" [ngModelOptions]="{ standalone: true }" /></td>
+              <td><input type="number" min="0" step="0.5" placeholder="kg" [(ngModel)]="ex.nextPoids" [ngModelOptions]="{ standalone: true }" /></td>
+              <td><button type="button" class="btn small" (click)="addDraftSerie(exIndex)">Ajouter</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (seanceError()) {
+      <p class="error-text">{{ seanceError() }}</p>
+    }
+
+    <button
+      type="button"
+      class="btn"
+      style="margin-top: 12px;"
+      [disabled]="savingSeance() || draftExercices().length === 0"
+      (click)="saveSeance()"
+    >
+      {{ savingSeance() ? 'Enregistrement…' : 'Enregistrer la séance' }}
+    </button>
+  </div>
+
+  <div class="card seance-history">
+    <p class="subhead">Historique</p>
+    @if (seances().length === 0) {
+      <p class="empty">Aucune séance enregistrée pour l'instant.</p>
+    }
+    @for (s of seances(); track s.idSeance) {
+      <div class="seance-entry">
+        <div class="seance-entry-head">
+          <span class="seance-date">{{ s.date }}</span>
+          @if (s.commentaire) {
+            <em>{{ s.commentaire }}</em>
+          }
+          <button type="button" class="btn danger" (click)="deleteSeance(s.idSeance)" title="Supprimer la séance">✕</button>
+        </div>
+        @for (ex of s.exercices; track ex.idExerciceSeance) {
+          <div class="seance-exercice">
+            <span class="seance-exercice-nom">{{ ex.nom }}</span>
+            <span class="seance-series">
+              @for (serie of ex.series; track serie.idSerie) {
+                <span class="serie-chip">{{ serie.nombreReps }} × {{ serie.poids ?? '–' }}kg</span>
+              }
+            </span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<section class="block">
+  <h2>Progression</h2>
+  <p class="sub">Évolution du poids max soulevé par exercice.</p>
+
+  <div class="card">
+    @if (exerciceNames().length === 0) {
+      <p class="empty">Enregistre une première séance pour voir apparaître un graphique.</p>
+    } @else {
+      <div class="week-toolbar">
+        <select [ngModel]="progressionExercice()" (ngModelChange)="selectProgressionExercice($event)" [ngModelOptions]="{ standalone: true }">
+          @for (nom of exerciceNames(); track nom) {
+            <option [value]="nom">{{ nom }}</option>
+          }
+        </select>
+      </div>
+      <div class="chart-wrap">
+        <app-progression-chart [points]="progressionPoints()"></app-progression-chart>
+      </div>
+    }
+  </div>
+</section>

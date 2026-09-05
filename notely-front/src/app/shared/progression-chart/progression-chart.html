@@ -1,0 +1,23 @@
+@if (!hasData()) {
+  <p class="empty">Pas encore de données pour cet exercice.</p>
+} @else {
+  <svg [attr.viewBox]="'0 0 ' + width + ' ' + height" class="chart-svg">
+    @for (tick of yTicks(); track tick.value) {
+      <line class="grid-line" [attr.x1]="plotLeft" [attr.x2]="plotRight" [attr.y1]="tick.y" [attr.y2]="tick.y" />
+      <text class="axis-label y-label" [attr.x]="plotLeft - 8" [attr.y]="tick.y" text-anchor="end" dominant-baseline="middle">
+        {{ tick.value | number: '1.0-1' }}
+      </text>
+    }
+
+    <polyline class="chart-line" [attr.points]="polylinePoints()" />
+
+    @for (p of chartPoints(); track $index) {
+      <circle class="chart-dot" [attr.cx]="p.x" [attr.cy]="p.y" r="3.5">
+        <title>{{ p.label }} — {{ p.value }} kg</title>
+      </circle>
+      @if (p.showLabel) {
+        <text class="axis-label x-label" [attr.x]="p.x" [attr.y]="baselineY + 18" text-anchor="middle">{{ p.label }}</text>
+      }
+    }
+  </svg>
+}

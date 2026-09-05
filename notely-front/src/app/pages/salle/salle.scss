@@ -1,0 +1,118 @@
+.seance-builder {
+  padding: 18px;
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.builder-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.builder-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 600;
+  min-width: 160px;
+}
+
+.builder-row label.grow {
+  flex: 1;
+}
+
+.add-exercice-row {
+  display: flex;
+  gap: 8px;
+}
+
+.add-exercice-row input {
+  flex: 1;
+}
+
+.draft-exercice {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.draft-exercice-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--row-form-bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.seance-history {
+  margin-top: 18px;
+  padding: 4px 0 8px;
+}
+
+.seance-entry {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.seance-entry:last-child {
+  border-bottom: none;
+}
+
+.seance-entry-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.seance-date {
+  font-family: 'Newsreader', serif;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.seance-entry-head em {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 13px;
+  flex: 1;
+}
+
+.seance-exercice {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 13.5px;
+  flex-wrap: wrap;
+}
+
+.seance-exercice-nom {
+  font-weight: 600;
+  min-width: 160px;
+}
+
+.seance-series {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.serie-chip {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 100px;
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
+.chart-wrap {
+  padding: 18px;
+}

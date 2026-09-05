@@ -1,0 +1,159 @@
+<section class="block">
+  <h2>À faire</h2>
+  <p class="sub">Tâches liées à un cours à gauche, pense-bête libre à droite.</p>
+
+  <div class="todo-grid">
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Cours</th>
+            <th>Fait</th>
+            <th>Date</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (sortedTodos().length === 0) {
+            <tr><td class="empty" colspan="5">Aucune tâche pour l'instant.</td></tr>
+          }
+          @for (todo of sortedTodos(); track todo.idTodo) {
+            <tr [class.done]="todo.fait">
+              <td class="nom">{{ todo.nom }}</td>
+              <td><span class="badge">{{ todo.nomCours }}</span></td>
+              <td><input type="checkbox" [checked]="todo.fait" (change)="toggleTodoFait(todo)" /></td>
+              <td>{{ todo.date || '—' }}</td>
+              <td><button class="btn danger" (click)="deleteTodo(todo.idTodo)" title="Supprimer">✕</button></td>
+            </tr>
+          }
+          <tr class="row-form">
+            <td><input type="text" placeholder="Nouvelle tâche" [(ngModel)]="newTodoNom" [ngModelOptions]="{standalone: true}" /></td>
+            <td>
+              <select [(ngModel)]="newTodoCoursId" [ngModelOptions]="{standalone: true}">
+                <option [ngValue]="null" disabled>Choisir un cours</option>
+                @for (c of coursList(); track c.idCours) {
+                  <option [ngValue]="c.idCours">{{ c.nom }}</option>
+                }
+              </select>
+            </td>
+            <td></td>
+            <td><input type="date" [(ngModel)]="newTodoDate" [ngModelOptions]="{standalone: true}" /></td>
+            <td><button class="btn small" (click)="addTodo()">Ajouter</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <p class="subhead">Pense-bête</p>
+      <table>
+        <tbody>
+          @if (notes().length === 0) {
+            <tr><td class="empty" colspan="3">Rien à noter pour l'instant.</td></tr>
+          }
+          @for (note of notes(); track note.idNote) {
+            <tr [class.done]="note.fait">
+              <td style="width:34px;"><input type="checkbox" [checked]="note.fait" (change)="toggleNoteFait(note)" /></td>
+              <td class="nom">{{ note.texte }}</td>
+              <td><button class="btn danger" (click)="deleteNote(note.idNote)" title="Supprimer">✕</button></td>
+            </tr>
+          }
+          <tr class="row-form">
+            <td></td>
+            <td><input type="text" placeholder="Nouvelle note" [(ngModel)]="newNoteTexte" [ngModelOptions]="{standalone: true}" /></td>
+            <td><button class="btn small" (click)="addNote()">Ajouter</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <h2>Mes cours</h2>
+  <p class="sub">Clique sur un cours pour voir ses tâches et ses chapitres.</p>
+
+  <div class="add-course">
+    <input type="text" placeholder="Nom du nouveau cours" [(ngModel)]="newCourseNom" [ngModelOptions]="{standalone: true}" (keyup.enter)="addCourse()" />
+    <button class="btn small" (click)="addCourse()">Ajouter un cours</button>
+  </div>
+
+  @if (coursList().length === 0) {
+    <div class="card"><p class="empty">Aucun cours pour l'instant, ajoute-en un ci-dessus.</p></div>
+  } @else {
+    <div class="gallery">
+      @for (c of coursList(); track c.idCours; let i = $index) {
+        <div class="course-card" [style.--tab]="tabColor(i)" tabindex="0" (click)="openCourseModal(c.idCours)" (keyup.enter)="openCourseModal(c.idCours)">
+          <svg class="ring" width="52" height="52" viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="20" fill="none" stroke="var(--line)" stroke-width="5" />
+            <circle
+              cx="26" cy="26" r="20" fill="none" [attr.stroke]="tabColor(i)" stroke-width="5"
+              stroke-linecap="round" [attr.stroke-dasharray]="ringCircumference" [attr.stroke-dashoffset]="ringOffset(progressPct(c))"
+              transform="rotate(-90 26 26)"
+            />
+            <text x="26" y="30" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, monospace" [attr.fill]="tabColor(i)">{{ progressPct(c) }}%</text>
+          </svg>
+          <p class="course-name">{{ c.nom }}</p>
+          <p class="course-meta">{{ c.nombreTachesOuvertes }} tâche{{ c.nombreTachesOuvertes > 1 ? 's' : '' }} · {{ c.nombreChapitres }} chap.</p>
+        </div>
+      }
+    </div>
+  }
+</section>
+
+<section class="block">
+  <h2>Calendrier</h2>
+  <p class="sub">Emploi du temps de la semaine, cours et examens confondus.</p>
+
+  <div class="card">
+    <app-week-calendar [events]="filteredEvents()" (eventClick)="onEventClick($event)">
+      <div calendar-chips class="filter-chips">
+        @for (type of chipTypes; track type) {
+          <button type="button" class="chip" [attr.data-chip]="type" [class.active]="isActive(type)" (click)="toggleType(type)">
+            <span class="dot"></span>{{ chipLabels[type] }}
+          </button>
+        }
+      </div>
+    </app-week-calendar>
+
+    <form class="event-add" [formGroup]="eventForm" (ngSubmit)="submitEvent()">
+      <select class="evt-type" formControlName="type">
+        <option value="cours">Cours (C)</option>
+        <option value="examen">Examen (E)</option>
+      </select>
+      <input type="text" formControlName="titre" placeholder="Titre (ex. Mathématiques)" />
+      <input type="date" formControlName="date" />
+      <input type="time" formControlName="heureDebut" />
+      <input type="time" formControlName="heureFin" />
+      <input type="color" formControlName="couleur" (input)="onColorInput()" title="Couleur de l'événement" />
+      <input type="text" formControlName="commentaire" placeholder="Commentaire (optionnel)" />
+      <button type="submit" class="btn" [disabled]="eventForm.invalid">Ajouter</button>
+    </form>
+    @if (eventForm.errors?.['endBeforeStart']) {
+      <p class="error-text" style="padding: 0 18px 12px;">L'heure de fin doit être après l'heure de début.</p>
+    }
+
+    <div class="exam-list-wrap">
+      <p class="subhead">Tous les examens</p>
+      <div class="exam-rows">
+        @if (examList().length === 0) {
+          <div class="empty">Aucun examen pour l'instant.</div>
+        }
+        @for (ex of examList(); track ex.idEvenement) {
+          <div class="exam-row">
+            <span>
+              <strong>{{ ex.date }}</strong> · {{ ex.heureDebut.slice(0, 5) }}–{{ ex.heureFin.slice(0, 5) }} — {{ ex.titre }}
+              @if (ex.commentaire) { <em>({{ ex.commentaire }})</em> }
+            </span>
+            <button class="btn danger" (click)="onEventClick(ex)" title="Supprimer">✕</button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (selectedCoursId(); as idCours) {
+  <app-course-modal [idCours]="idCours" (closed)="closeCourseModal()" (changed)="onModalChanged()"></app-course-modal>
+}

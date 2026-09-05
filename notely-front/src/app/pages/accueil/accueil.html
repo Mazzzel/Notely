@@ -1,0 +1,22 @@
+<section class="block">
+  <h2>Calendrier général</h2>
+  <p class="sub">Vue d'ensemble de la semaine : cours, examens et séances salle.</p>
+
+  <div class="card">
+    <app-week-calendar [events]="filteredEvents()" (eventClick)="onEventClick($event)">
+      <div calendar-chips class="filter-chips">
+        @for (type of chipTypes; track type) {
+          <button
+            type="button"
+            class="chip"
+            [attr.data-chip]="type"
+            [class.active]="isActive(type)"
+            (click)="toggleType(type)"
+          >
+            <span class="dot"></span>{{ chipLabels[type] }}
+          </button>
+        }
+      </div>
+    </app-week-calendar>
+  </div>
+</section>

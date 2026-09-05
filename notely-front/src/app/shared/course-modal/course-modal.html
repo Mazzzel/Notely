@@ -1,0 +1,100 @@
+@if (detail(); as d) {
+  <div class="overlay open" (click)="onOverlayClick($event)">
+    <div class="modal">
+      <div class="modal-head">
+        <input
+          class="modal-title-input"
+          type="text"
+          [(ngModel)]="titleDraft"
+          (blur)="saveTitle()"
+          (keyup.enter)="saveTitle()"
+        />
+        <button class="close-x" (click)="close()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="sub" style="margin-top:-4px;">À faire pour ce cours</p>
+        <div class="card">
+          <table>
+            <thead>
+              <tr><th>Nom</th><th>Fait</th><th>Date</th><th></th></tr>
+            </thead>
+            <tbody>
+              @if (d.todos.length === 0) {
+                <tr><td class="empty" colspan="4">Aucune tâche pour l'instant.</td></tr>
+              }
+              @for (todo of d.todos; track todo.idTodo) {
+                <tr [class.done]="todo.fait">
+                  <td class="nom">{{ todo.nom }}</td>
+                  <td><input type="checkbox" [checked]="todo.fait" (change)="toggleTodoFait(todo)" /></td>
+                  <td>{{ todo.date || '—' }}</td>
+                  <td><button class="btn danger" (click)="deleteTodo(todo.idTodo)">✕</button></td>
+                </tr>
+              }
+              <tr class="row-form">
+                <td><input type="text" placeholder="Nouvelle tâche" [(ngModel)]="newTodoNom" [ngModelOptions]="{standalone: true}" /></td>
+                <td></td>
+                <td><input type="date" [(ngModel)]="newTodoDate" [ngModelOptions]="{standalone: true}" /></td>
+                <td><button class="btn small" (click)="addTodo()">Ajouter</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 style="margin-top:28px;">Chapitres</h2>
+        <p class="sub" style="margin-top:-4px;">État d'avancement du cours</p>
+        <div class="card">
+          <table>
+            <thead>
+              <tr><th>Chapitre</th><th>État</th><th>Date</th><th>Difficulté</th><th></th></tr>
+            </thead>
+            <tbody>
+              @if (d.chapitres.length === 0) {
+                <tr><td class="empty" colspan="5">Aucun chapitre pour l'instant.</td></tr>
+              }
+              @for (ch of d.chapitres; track ch.idChapitre) {
+                <tr>
+                  <td>{{ ch.libelle }}</td>
+                  <td>
+                    <select
+                      [class]="'etat-' + ch.etat"
+                      [ngModel]="ch.etat"
+                      (ngModelChange)="updateChapitreEtat(ch, $event)"
+                      [ngModelOptions]="{standalone: true}"
+                    >
+                      <option value="non_appris">Non appris</option>
+                      <option value="en_cours">En cours</option>
+                      <option value="appris">Appris</option>
+                    </select>
+                  </td>
+                  <td>{{ ch.date || '—' }}</td>
+                  <td><span class="badge" [class]="ch.difficulte">{{ diffLabel[ch.difficulte] }}</span></td>
+                  <td><button class="btn danger" (click)="deleteChapitre(ch.idChapitre)">✕</button></td>
+                </tr>
+              }
+              <tr class="row-form">
+                <td><input type="text" placeholder="Nouveau chapitre" [(ngModel)]="newChapitreLibelle" [ngModelOptions]="{standalone: true}" /></td>
+                <td>
+                  <select [(ngModel)]="newChapitreEtat" [ngModelOptions]="{standalone: true}">
+                    <option value="non_appris">Non appris</option>
+                    <option value="en_cours">En cours</option>
+                    <option value="appris">Appris</option>
+                  </select>
+                </td>
+                <td><input type="date" [(ngModel)]="newChapitreDate" [ngModelOptions]="{standalone: true}" /></td>
+                <td>
+                  <select [(ngModel)]="newChapitreDifficulte" [ngModelOptions]="{standalone: true}">
+                    <option value="facile">Facile</option>
+                    <option value="moyen">Moyen</option>
+                    <option value="difficile">Difficile</option>
+                  </select>
+                </td>
+                <td><button class="btn small" (click)="addChapitre()">Ajouter</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+}

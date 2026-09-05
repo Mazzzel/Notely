@@ -1,0 +1,19 @@
+<header class="top">
+  <div>
+    <p class="eyebrow">Semestre en cours</p>
+    <h1>Carnet de cours</h1>
+  </div>
+  <div class="top-actions">
+    <span class="today">{{ today }}</span>
+    <button type="button" class="btn ghost small icon-btn" (click)="theme.toggle()" [title]="theme.theme() === 'dark' ? 'Passer en clair' : 'Passer en sombre'">
+      {{ theme.theme() === 'dark' ? '☀️' : '🌙' }}
+    </button>
+    <button type="button" class="btn ghost small" (click)="logout()">Déconnexion</button>
+  </div>
+</header>
+
+<nav class="tabbar">
+  <a routerLink="/accueil" routerLinkActive="active" class="tab-btn">Accueil</a>
+  <a routerLink="/cours" routerLinkActive="active" class="tab-btn">Cours</a>
+  <a routerLink="/salle" routerLinkActive="active" class="tab-btn">Salle</a>
+</nav>

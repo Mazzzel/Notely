@@ -1,0 +1,51 @@
+<div class="week-toolbar">
+  <ng-content select="[calendar-chips]"></ng-content>
+  <div class="week-nav2">
+    <button type="button" class="btn ghost small" (click)="goToday()">Aujourd'hui</button>
+    <button type="button" class="btn ghost small" (click)="goPrev()">←</button>
+    <span class="week-label2">{{ weekLabel() }}</span>
+    <button type="button" class="btn ghost small" (click)="goNext()">→</button>
+  </div>
+</div>
+
+<div class="week-wrap">
+  <div class="week-headrow">
+    <div class="week-head-gutter"></div>
+    @for (day of days(); track day.iso) {
+      <div class="week-head-day" [class.today]="day.isToday">
+        <div class="dow">{{ day.dow }}</div>
+        <div class="dnum">{{ day.dnum }}</div>
+      </div>
+    }
+  </div>
+
+  <div class="week-body">
+    <div class="week-gutter" [style.height.px]="gridHeight">
+      @for (hl of hourLabels(); track hl.label) {
+        <div class="hour-label" [style.top.px]="hl.top">{{ hl.label }}</div>
+      }
+    </div>
+
+    @for (day of days(); track day.iso) {
+      <div class="week-day-col" [class.today]="day.isToday" [style.height.px]="gridHeight">
+        @for (evt of day.events; track evt.source.idEvenement) {
+          <div
+            class="evt"
+            [style.top.px]="evt.top"
+            [style.height.px]="evt.height"
+            [style.left.%]="evt.leftPct"
+            [style.width.%]="evt.widthPct"
+            [style.background]="evt.background"
+            [style.color]="evt.color"
+            [title]="evt.title + ' ' + evt.timeRange"
+            (click)="onEventClick(evt.source)"
+          >
+            <span class="evt-type">{{ evt.badge }}</span>
+            <span class="evt-title">{{ evt.title }}</span>
+            <span class="evt-time">{{ evt.timeRange }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
