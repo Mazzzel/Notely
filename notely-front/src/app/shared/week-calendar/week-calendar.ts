@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, model, output } from '@angular/core';
 import { EvenementDTO, TypeEvenement } from '../../core/models/evenement.model';
 
 const DAY_START = 6 * 60;
@@ -34,7 +34,7 @@ interface HourLabel {
   label: string;
 }
 
-function startOfWeek(d: Date): Date {
+export function startOfWeek(d: Date): Date {
   const dt = new Date(d);
   const dow = (dt.getDay() + 6) % 7;
   dt.setDate(dt.getDate() - dow);
@@ -42,7 +42,7 @@ function startOfWeek(d: Date): Date {
   return dt;
 }
 
-function addDays(d: Date, n: number): Date {
+export function addDays(d: Date, n: number): Date {
   const r = new Date(d);
   r.setDate(r.getDate() + n);
   return r;
@@ -98,7 +98,7 @@ export class WeekCalendarComponent {
   events = input.required<EvenementDTO[]>();
   eventClick = output<EvenementDTO>();
 
-  private weekCursor = signal(new Date());
+  readonly weekCursor = model(new Date());
 
   readonly gridHeight = GRID_HEIGHT;
 

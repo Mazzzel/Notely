@@ -107,7 +107,7 @@
   <p class="sub">Emploi du temps de la semaine, cours et examens confondus.</p>
 
   <div class="card">
-    <app-week-calendar [events]="filteredEvents()" (eventClick)="onEventClick($event)">
+    <app-week-calendar [events]="filteredEvents()" [(weekCursor)]="calendarWeek" (eventClick)="onEventClick($event)">
       <div calendar-chips class="filter-chips">
         @for (type of chipTypes; track type) {
           <button type="button" class="chip" [attr.data-chip]="type" [class.active]="isActive(type)" (click)="toggleType(type)">
@@ -116,6 +116,12 @@
         }
       </div>
     </app-week-calendar>
+
+    <div class="copy-week">
+      <span class="sub" style="margin:0;">Copier les cours de cette semaine vers la semaine du</span>
+      <input type="date" [(ngModel)]="copyTargetDate" [ngModelOptions]="{standalone: true}" />
+      <button type="button" class="btn small" (click)="copyWeek()" [disabled]="!copyTargetDate">Copier</button>
+    </div>
 
     <form class="event-add" [formGroup]="eventForm" (ngSubmit)="submitEvent()">
       <select class="evt-type" formControlName="type">

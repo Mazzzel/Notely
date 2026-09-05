@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { CoursService } from '../../core/services/cours.service';
 import { TodoService } from '../../core/services/todo.service';
 import { NoteService } from '../../core/services/note.service';
@@ -8,7 +9,7 @@ import { CoursDTO } from '../../core/models/cours.model';
 import { TodoDTO } from '../../core/models/todo.model';
 import { NoteDTO } from '../../core/models/note.model';
 import { EvenementDTO, TypeEvenement } from '../../core/models/evenement.model';
-import { WeekCalendarComponent } from '../../shared/week-calendar/week-calendar';
+import { WeekCalendarComponent, addDays, startOfWeek } from '../../shared/week-calendar/week-calendar';
 import { CourseModalComponent } from '../../shared/course-modal/course-modal';
 
 function endAfterStart(): ValidatorFn {
@@ -68,6 +69,8 @@ export class CoursComponent implements OnInit {
 
   private colorTouched = false;
   readonly eventType = signal<TypeEvenement>('cours');
+  readonly calendarWeek = signal(new Date());
+  copyTargetDate = '';
 
   newTodoNom = '';
   newTodoCoursId: number | null = null;
@@ -226,6 +229,36 @@ export class CoursComponent implements OnInit {
         this.eventForm.patchValue({ titre: '', heureDebut: '', heureFin: '', commentaire: '' });
         this.loadEvents();
       });
+  }
+
+  copyWeek(): void {
+    if (!this.copyTargetDate) return;
+
+    const sourceMonday = startOfWeek(this.calendarWeek());
+    const targetMonday = startOfWeek(new Date(`${this.copyTargetDate}T00:00:00`));
+    const offsetDays = Math.round((targetMonday.getTime() - sourceMonday.getTime()) / 86_400_000);
+    if (offsetDays === 0) return;
+
+    const sourceIsoDates = new Set([...Array(7)].map((_, i) => toLocalISODate(addDays(sourceMonday, i))));
+    const toCopy = this.allEvents().filter((e) => e.type === 'cours' && sourceIsoDates.has(e.date));
+    if (toCopy.length === 0) return;
+
+    const creations = toCopy.map((e) =>
+      this.evenementService.create({
+        type: e.type,
+        titre: e.titre,
+        couleur: e.couleur,
+        date: toLocalISODate(addDays(new Date(`${e.date}T00:00:00`), offsetDays)),
+        heureDebut: e.heureDebut,
+        heureFin: e.heureFin,
+        commentaire: e.commentaire
+      })
+    );
+
+    forkJoin(creations).subscribe(() => {
+      this.copyTargetDate = '';
+      this.loadEvents();
+    });
   }
 
   private loadCours(): void {
