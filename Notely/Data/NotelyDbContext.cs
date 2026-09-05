@@ -10,6 +10,7 @@ public class NotelyDbContext : DbContext
     }
 
     public DbSet<Compte> Comptes => Set<Compte>();
+    public DbSet<CompteAccesPage> AccesPages => Set<CompteAccesPage>();
     public DbSet<Cours> Cours => Set<Cours>();
     public DbSet<Chapitre> Chapitres => Set<Chapitre>();
     public DbSet<Todo> Todos => Set<Todo>();
@@ -26,6 +27,16 @@ public class NotelyDbContext : DbContext
 
         modelBuilder.Entity<Compte>()
             .HasIndex(c => c.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<CompteAccesPage>()
+            .HasOne(a => a.CompteNav)
+            .WithMany(c => c.AccesPages)
+            .HasForeignKey(a => a.IdCompte)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CompteAccesPage>()
+            .HasIndex(a => new { a.IdCompte, a.CodePage })
             .IsUnique();
 
         modelBuilder.Entity<Cours>()

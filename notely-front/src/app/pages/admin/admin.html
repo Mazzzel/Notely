@@ -1,0 +1,48 @@
+<section class="block">
+  <h2>Administration</h2>
+  <p class="sub">Accès accordé par compte. Les comptes sont créés directement en base ; ici, on choisit uniquement les pages auxquelles chacun a droit.</p>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Cours</th>
+          <th>Salle</th>
+          <th>Dernière connexion</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (comptes().length === 0) {
+          <tr><td class="empty" colspan="5">Aucun compte pour l'instant.</td></tr>
+        }
+        @for (compte of comptes(); track compte.idCompte) {
+          <tr>
+            <td class="nom">{{ compte.email }}</td>
+            <td><span class="badge">{{ compte.estAdmin ? 'Admin' : 'Utilisateur' }}</span></td>
+            <td>
+              <input
+                type="checkbox"
+                [checked]="hasPage(compte, 'cours')"
+                [disabled]="compte.estAdmin"
+                (change)="togglePage(compte, 'cours')"
+              />
+            </td>
+            <td>
+              <input
+                type="checkbox"
+                [checked]="hasPage(compte, 'salle')"
+                [disabled]="compte.estAdmin"
+                (change)="togglePage(compte, 'salle')"
+              />
+            </td>
+            <td>{{ compte.dateDerniereConnexion ? (compte.dateDerniereConnexion | slice:0:10) : '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="sub" style="margin-top:12px;">Le statut admin et la création de comptes se gèrent uniquement en base de données.</p>
+</section>

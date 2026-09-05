@@ -67,6 +67,7 @@ export class CoursComponent implements OnInit {
   readonly chipLabels: Record<TypeEvenement, string> = { cours: 'Cours', examen: 'Examens', salle: 'Salle' };
 
   private colorTouched = false;
+  readonly eventType = signal<TypeEvenement>('cours');
 
   newTodoNom = '';
   newTodoCoursId: number | null = null;
@@ -94,6 +95,7 @@ export class CoursComponent implements OnInit {
     this.loadEvents();
 
     this.eventForm.get('type')!.valueChanges.subscribe((type) => {
+      this.eventType.set(type);
       if (!this.colorTouched) this.eventForm.get('couleur')!.setValue(DEFAULT_COLORS[type]);
     });
   }

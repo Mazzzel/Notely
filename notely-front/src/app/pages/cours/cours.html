@@ -122,7 +122,16 @@
         <option value="cours">Cours (C)</option>
         <option value="examen">Examen (E)</option>
       </select>
-      <input type="text" formControlName="titre" placeholder="Titre (ex. Mathématiques)" />
+      @if (eventType() === 'cours' && coursList().length > 0) {
+        <select formControlName="titre">
+          <option value="" disabled>Choisir un cours</option>
+          @for (c of coursList(); track c.idCours) {
+            <option [value]="c.nom">{{ c.nom }}</option>
+          }
+        </select>
+      } @else {
+        <input type="text" formControlName="titre" placeholder="Titre (ex. Mathématiques)" />
+      }
       <input type="date" formControlName="date" />
       <input type="time" formControlName="heureDebut" />
       <input type="time" formControlName="heureFin" />

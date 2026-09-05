@@ -75,7 +75,7 @@ public class AuthController(
     [ProducesResponseType(typeof(CompteDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<CompteDTO>> Me()
     {
-        var compte = await _manager.GetByIdAsync(User.GetIdCompte());
+        var compte = await _manager.GetByIdWithAccesPagesAsync(User.GetIdCompte());
         if (compte is null)
             return NotFound();
 

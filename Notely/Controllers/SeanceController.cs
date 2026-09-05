@@ -10,7 +10,7 @@ namespace Notely.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]
-[Authorize(Policy = Policies.Authorized)]
+[Authorize(Policy = Policies.PageSalle)]
 public class SeanceController(SeanceManager _manager, IMapper _mapper) : ControllerBase
 {
     [HttpGet]

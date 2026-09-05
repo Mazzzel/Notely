@@ -38,6 +38,7 @@ builder.Services.AddScoped<EvenementManager>();
 builder.Services.AddScoped<SeanceManager>();
 builder.Services.AddScoped<ExerciceSeanceManager>();
 builder.Services.AddScoped<SerieManager>();
+builder.Services.AddScoped<CompteAccesPageManager>();
 
 //------------------------------Services------------------------------
 builder.Services.AddSingleton<IPasswordHasher, Sha256PasswordHasher>();
@@ -67,8 +68,16 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(Policies.Authorized, policy =>
         policy.RequireAuthenticatedUser().AddRequirements(new MustChangePasswordRequirement()));
+    options.AddPolicy(Policies.Admin, policy =>
+        policy.RequireAuthenticatedUser().AddRequirements(new MustChangePasswordRequirement(), new AdminRequirement()));
+    options.AddPolicy(Policies.PageCours, policy =>
+        policy.RequireAuthenticatedUser().AddRequirements(new MustChangePasswordRequirement(), new PageAccessRequirement("cours")));
+    options.AddPolicy(Policies.PageSalle, policy =>
+        policy.RequireAuthenticatedUser().AddRequirements(new MustChangePasswordRequirement(), new PageAccessRequirement("salle")));
 });
 builder.Services.AddSingleton<IAuthorizationHandler, MustChangePasswordHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, AdminHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PageAccessHandler>();
 
 //------------------------------CORS (front Angular)------------------------------
 var allowedOrigin = builder.Configuration["Cors:AllowedOrigin"];

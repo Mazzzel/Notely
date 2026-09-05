@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, authenticatedGuard, guestGuard } from './core/guards/auth.guard';
+import { authGuard, authenticatedGuard, guestGuard, adminGuard, pageGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -19,8 +19,21 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'accueil' },
       { path: 'accueil', loadComponent: () => import('./pages/accueil/accueil').then((m) => m.AccueilComponent) },
-      { path: 'cours', loadComponent: () => import('./pages/cours/cours').then((m) => m.CoursComponent) },
-      { path: 'salle', loadComponent: () => import('./pages/salle/salle').then((m) => m.SalleComponent) }
+      {
+        path: 'cours',
+        canActivate: [pageGuard('cours')],
+        loadComponent: () => import('./pages/cours/cours').then((m) => m.CoursComponent)
+      },
+      {
+        path: 'salle',
+        canActivate: [pageGuard('salle')],
+        loadComponent: () => import('./pages/salle/salle').then((m) => m.SalleComponent)
+      },
+      {
+        path: 'admin',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./pages/admin/admin').then((m) => m.AdminComponent)
+      }
     ]
   },
   { path: '**', redirectTo: '' }

@@ -30,6 +30,12 @@ public class Compte
     [Column("com_date_derniere_connexion")]
     public DateTime? DateDerniereConnexion { get; set; }
 
+    [Column("com_est_admin")]
+    public bool EstAdmin { get; set; } = false;
+
+    [InverseProperty(nameof(Entities.CompteAccesPage.CompteNav))]
+    public virtual ICollection<CompteAccesPage> AccesPages { get; set; } = new List<CompteAccesPage>();
+
     [InverseProperty(nameof(Entities.Cours.CompteNav))]
     public virtual ICollection<Cours> Cours { get; set; } = new List<Cours>();
 

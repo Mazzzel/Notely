@@ -10,7 +10,7 @@ namespace Notely.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]
-[Authorize(Policy = Policies.Authorized)]
+[Authorize(Policy = Policies.PageSalle)]
 public class SerieController(SerieManager _manager, ExerciceSeanceManager _exerciceSeanceManager, IMapper _mapper) : ControllerBase
 {
     [HttpGet("{id}")]

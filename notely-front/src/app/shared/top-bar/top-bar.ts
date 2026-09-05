@@ -14,6 +14,12 @@ export class TopBarComponent {
   private router = inject(Router);
   protected theme = inject(ThemeService);
 
+  readonly isAdmin = this.auth.isAdmin;
+
+  hasPageAccess(page: 'cours' | 'salle'): boolean {
+    return this.auth.hasPageAccess(page);
+  }
+
   readonly today = new Date().toLocaleDateString('fr-FR', {
     weekday: 'long',
     day: 'numeric',

@@ -67,8 +67,27 @@
                       <option value="appris">Appris</option>
                     </select>
                   </td>
-                  <td>{{ ch.date || '—' }}</td>
-                  <td><span class="badge" [class]="ch.difficulte">{{ diffLabel[ch.difficulte] }}</span></td>
+                  <td>
+                    <input
+                      type="date"
+                      [ngModel]="ch.date"
+                      (ngModelChange)="updateChapitreDate(ch, $event)"
+                      [ngModelOptions]="{standalone: true}"
+                    />
+                  </td>
+                  <td>
+                    <select
+                      class="badge"
+                      [class]="ch.difficulte"
+                      [ngModel]="ch.difficulte"
+                      (ngModelChange)="updateChapitreDifficulte(ch, $event)"
+                      [ngModelOptions]="{standalone: true}"
+                    >
+                      <option value="facile">Facile</option>
+                      <option value="moyen">Moyen</option>
+                      <option value="difficile">Difficile</option>
+                    </select>
+                  </td>
                   <td><button class="btn danger" (click)="deleteChapitre(ch.idChapitre)">✕</button></td>
                 </tr>
               }

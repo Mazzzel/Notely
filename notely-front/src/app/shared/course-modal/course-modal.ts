@@ -89,8 +89,26 @@ export class CourseModalComponent implements OnInit {
   }
 
   updateChapitreEtat(chapitre: ChapitreDTO, etat: EtatChapitre): void {
+    this.patchChapitre(chapitre, { etat });
+  }
+
+  updateChapitreDate(chapitre: ChapitreDTO, date: string): void {
+    this.patchChapitre(chapitre, { date: date || null });
+  }
+
+  updateChapitreDifficulte(chapitre: ChapitreDTO, difficulte: Difficulte): void {
+    this.patchChapitre(chapitre, { difficulte });
+  }
+
+  private patchChapitre(chapitre: ChapitreDTO, patch: Partial<Pick<ChapitreDTO, 'etat' | 'date' | 'difficulte'>>): void {
     this.chapitreService
-      .update(chapitre.idChapitre, { libelle: chapitre.libelle, etat, date: chapitre.date, difficulte: chapitre.difficulte })
+      .update(chapitre.idChapitre, {
+        libelle: chapitre.libelle,
+        etat: chapitre.etat,
+        date: chapitre.date,
+        difficulte: chapitre.difficulte,
+        ...patch
+      })
       .subscribe(() => {
         this.load();
         this.changed.emit();

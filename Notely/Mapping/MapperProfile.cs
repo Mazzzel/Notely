@@ -1,5 +1,6 @@
 using AutoMapper;
 using Notely.Dto;
+using Notely.Dto.Admin;
 using Notely.Dto.Auth;
 using Notely.Entities;
 
@@ -11,8 +12,12 @@ public class MapperProfile : Profile
     {
         //---------------------------------Compte---------------------------------
 
-        CreateMap<Compte, CompteDTO>();
-        CreateMap<Compte, LoginResponseDTO>();
+        CreateMap<Compte, CompteDTO>()
+            .ForMember(d => d.Pages, o => o.MapFrom(s => s.AccesPages.Select(p => p.CodePage)));
+        CreateMap<Compte, LoginResponseDTO>()
+            .ForMember(d => d.Pages, o => o.MapFrom(s => s.AccesPages.Select(p => p.CodePage)));
+        CreateMap<Compte, CompteAdminDTO>()
+            .ForMember(d => d.Pages, o => o.MapFrom(s => s.AccesPages.Select(p => p.CodePage)));
 
         //---------------------------------Cours---------------------------------
 

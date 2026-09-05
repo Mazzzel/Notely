@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { CodePage } from '../models/compte.model';
 
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
@@ -27,6 +28,22 @@ export const authenticatedGuard: CanActivateFn = () => {
   if (auth.currentUser()) return true;
 
   return auth.me().pipe(map((u) => (u ? true : router.parseUrl('/login'))));
+};
+
+export const adminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return auth.isAdmin() ? true : router.parseUrl('/accueil');
+};
+
+export const pageGuard = (page: CodePage): CanActivateFn => {
+  return () => {
+    const auth = inject(AuthService);
+    const router = inject(Router);
+
+    return auth.hasPageAccess(page) ? true : router.parseUrl('/accueil');
+  };
 };
 
 export const guestGuard: CanActivateFn = () => {

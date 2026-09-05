@@ -17,6 +17,13 @@ export class AuthService {
   readonly currentUser = this.compte.asReadonly();
   readonly isLoggedIn = computed(() => this.compte() !== null);
   readonly mustChangePassword = computed(() => this.compte()?.doitChangerMotDePasse ?? false);
+  readonly isAdmin = computed(() => this.compte()?.estAdmin ?? false);
+
+  hasPageAccess(page: 'cours' | 'salle'): boolean {
+    const user = this.compte();
+    if (!user) return false;
+    return user.estAdmin || user.pages.includes(page);
+  }
 
   getToken(): string | null {
     return this.token();
@@ -30,6 +37,8 @@ export class AuthService {
           idCompte: res.idCompte,
           email: res.email,
           doitChangerMotDePasse: res.doitChangerMotDePasse,
+          estAdmin: res.estAdmin,
+          pages: res.pages,
           dateCreation: '',
           dateDerniereConnexion: null
         });

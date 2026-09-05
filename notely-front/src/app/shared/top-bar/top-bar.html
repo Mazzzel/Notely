@@ -14,6 +14,13 @@
 
 <nav class="tabbar">
   <a routerLink="/accueil" routerLinkActive="active" class="tab-btn">Accueil</a>
-  <a routerLink="/cours" routerLinkActive="active" class="tab-btn">Cours</a>
-  <a routerLink="/salle" routerLinkActive="active" class="tab-btn">Salle</a>
+  @if (hasPageAccess('cours')) {
+    <a routerLink="/cours" routerLinkActive="active" class="tab-btn">Cours</a>
+  }
+  @if (hasPageAccess('salle')) {
+    <a routerLink="/salle" routerLinkActive="active" class="tab-btn">Salle</a>
+  }
+  @if (isAdmin()) {
+    <a routerLink="/admin" routerLinkActive="active" class="tab-btn">Admin</a>
+  }
 </nav>

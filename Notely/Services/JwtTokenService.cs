@@ -25,6 +25,7 @@ public class JwtTokenService : IJwtTokenService
             new Claim(ClaimTypes.NameIdentifier, compte.Email),
             new Claim("idCompte", compte.IdCompte.ToString()),
             new Claim("doitChangerMdp", compte.DoitChangerMotDePasse ? "true" : "false"),
+            new Claim("estAdmin", compte.EstAdmin ? "true" : "false"),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

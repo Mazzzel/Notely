@@ -10,7 +10,7 @@ namespace Notely.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]
-[Authorize(Policy = Policies.Authorized)]
+[Authorize(Policy = Policies.PageCours)]
 public class CoursController(CoursManager _manager, IMapper _mapper) : ControllerBase
 {
     [HttpGet]
