@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://REPLACE-WITH-RENDER-URL.onrender.com/api'
+  apiUrl: 'https://notely-q85t.onrender.com/api'
 };
